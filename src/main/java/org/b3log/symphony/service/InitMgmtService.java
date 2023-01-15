@@ -57,7 +57,7 @@ public class InitMgmtService {
     /**
      * Default language.
      */
-    private static final String DEFAULT_LANG = "zh_CN";
+    private static final String DEFAULT_LANG = "en_US";
 
     private static final Set<String> VISITOR_PERMISSIONS = new HashSet<>();
     private static final Set<String> DEFAULT_PERMISSIONS = new HashSet<>();
@@ -633,58 +633,7 @@ public class InitMgmtService {
             final String adminId = userMgmtService.addUser(admin);
             admin.put(Keys.OBJECT_ID, adminId);
 
-            // Init community bot
-            final JSONObject comBot = new JSONObject();
-            comBot.put(User.USER_EMAIL, UserExt.COM_BOT_EMAIL);
-            comBot.put(User.USER_NAME, UserExt.COM_BOT_NAME);
-            comBot.put(User.USER_PASSWORD, DigestUtils.md5Hex(String.valueOf(new Random().nextInt())));
-            comBot.put(UserExt.USER_LANGUAGE, DEFAULT_LANG);
-            comBot.put(UserExt.USER_GUIDE_STEP, UserExt.USER_GUIDE_STEP_FIN);
-            comBot.put(User.USER_ROLE, Role.ROLE_ID_C_DEFAULT);
-            comBot.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
-            userMgmtService.addUser(comBot);
-
-            // Init community anonymous user placeholder
-            final JSONObject someone = new JSONObject();
-            someone.put(User.USER_EMAIL, UserExt.ANONYMOUS_USER_NAME + UserExt.USER_BUILTIN_EMAIL_SUFFIX);
-            someone.put(User.USER_NAME, UserExt.ANONYMOUS_USER_NAME);
-            someone.put(UserExt.USER_NICKNAME, UserExt.ANONYMOUS_USER_NAME);
-            someone.put(User.USER_PASSWORD, DigestUtils.md5Hex(String.valueOf(new Random().nextInt())));
-            someone.put(UserExt.USER_LANGUAGE, DEFAULT_LANG);
-            someone.put(UserExt.USER_GUIDE_STEP, UserExt.USER_GUIDE_STEP_FIN);
-            someone.put(User.USER_ROLE, Role.ROLE_ID_C_DEFAULT);
-            someone.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
-            userMgmtService.addUser(someone);
-
             LOGGER.info("Initialized system users");
-
-            // Add tags
-            String tagTitle = Symphonys.SYS_ANNOUNCE_TAG;
-            String tagId = tagMgmtService.addTag(adminId, tagTitle);
-            JSONObject tag = tagRepository.get(tagId);
-            tag.put(Tag.TAG_URI, "announcement");
-            tagMgmtService.updateTag(tagId, tag);
-
-            tagTitle = "Sym";
-            tagId = tagMgmtService.addTag(adminId, tagTitle);
-            tag = tagRepository.get(tagId);
-            tag.put(Tag.TAG_URI, "sym");
-            tag.put(Tag.TAG_ICON_PATH, Latkes.getStaticServePath() + "/images/tags/sym.png");
-            tag.put(Tag.TAG_DESCRIPTION, "[Sym](https://github.com/88250/symphony) 是一款用 Java 实现的现代化社区（论坛/BBS/社交网络/博客）平台，“下一代的社区系统，为未来而构建”。");
-            tagMgmtService.updateTag(tagId, tag);
-
-            LOGGER.log(Level.INFO, "Initialized tag data");
-
-            // Hello World!
-            final JSONObject article = new JSONObject();
-            article.put(Article.ARTICLE_TITLE, "欢迎来到 Sym 社区 :gift_heart:");
-            article.put(Article.ARTICLE_TAGS, "系统公告,Sym");
-            article.put(Article.ARTICLE_CONTENT, "社区愿景、行为准则、功能等请在此进行描述介绍。");
-            article.put(Article.ARTICLE_EDITOR_TYPE, 0);
-            article.put(Article.ARTICLE_AUTHOR_ID, admin.optString(Keys.OBJECT_ID));
-
-            articleMgmtService.addArticle(article);
-
             LOGGER.info("Initialized Sym, have fun!");
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Initializes Sym failed", e);
